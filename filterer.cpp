@@ -3,15 +3,16 @@
 #include <cstdlib>
 #include <cstring>
 #include <algorithm>
+#include <ctime>   
 using namespace std;
 
 class PNMImage {
 private:
-    char magic[3];     
+    char magic[3];
     int width;
     int height;
     int max_color;
-    int* pixels;        
+    int* pixels;
     int pixel_count;
 
     void applyKernel(const float kernel[3][3]) {
@@ -29,7 +30,6 @@ private:
                     float sum = 0.0;
                     float weight_sum = 0.0;
 
-                   
                     for (int ky = -1; ky <= 1; ky++) {
                         for (int kx = -1; kx <= 1; kx++) {
                             int nx = x + kx;
@@ -43,11 +43,9 @@ private:
                         }
                     }
 
-                    
                     float value = (weight_sum != 0) ? sum / weight_sum : sum;
                     int result = static_cast<int>(value);
 
-                    
                     result = max(0, min(max_color, result));
 
                     int idx = (y * width + x) * channels + c;
@@ -56,23 +54,19 @@ private:
             }
         }
 
-     
         free(pixels);
         pixels = result_pixels;
     }
 
 public:
-    // Constructor
     PNMImage() : width(0), height(0), max_color(0), pixels(nullptr), pixel_count(0) {
         magic[0] = '\0';
     }
 
-    // Destructor
     ~PNMImage() {
         if (pixels) free(pixels);
     }
 
-    
     bool load(const char* filename) {
         FILE* file = fopen(filename, "r");
         if (!file) {
@@ -100,7 +94,7 @@ public:
 
         pixel_count = width * height;
         if (strcmp(magic, "P3") == 0) {
-            pixel_count *= 3; 
+            pixel_count *= 3;
         }
 
         pixels = (int*) malloc(pixel_count * sizeof(int));
@@ -124,7 +118,6 @@ public:
         return true;
     }
 
-    
     bool save(const char* filename) const {
         FILE* out = fopen(filename, "w");
         if (!out) {
@@ -142,8 +135,6 @@ public:
         fclose(out);
         return true;
     }
-
-  
 
     void applyBlur() {
         const float kernel[3][3] = {
@@ -181,14 +172,14 @@ int main(int argc, char* argv[]) {
     }
 
     PNMImage img;
-
     if (!img.load(argv[1])) return 1;
 
-    
     if (strcmp(argv[3], "--f") != 0) {
         cerr << "Error: se esperaba la bandera --f\n";
         return 1;
     }
+
+    clock_t start_time = clock();
 
     if (strcmp(argv[4], "blur") == 0) {
         img.applyBlur();
@@ -200,6 +191,11 @@ int main(int argc, char* argv[]) {
         cerr << "Filtro no reconocido: " << argv[4] << endl;
         return 1;
     }
+
+    clock_t end_time = clock();
+
+    double cpu_time = double(end_time - start_time) / CLOCKS_PER_SEC;
+    cout << "Tiempo de CPU usado en el filtrado: " << cpu_time << " segundos" << endl;
 
     if (!img.save(argv[2])) return 1;
 
