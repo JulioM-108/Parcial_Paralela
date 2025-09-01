@@ -1,0 +1,52 @@
+services:
+  master:
+    image: japeto/parallel-tools
+    container_name: master
+    hostname: master
+    networks: [mpi-net]
+    volumes:
+      - C:/Users/julio/OneDrive/Universidad/Noveno_Semestre/Paralela/Parcial_Paralela/Images:/app/imagenes
+      - C:/Users/julio/OneDrive/Universidad/Noveno_Semestre/Paralela/Parcial_Paralela/Output_Images:/app/output
+    tty: true
+    stdin_open: true
+    command: sleep infinity
+
+  node1:
+    image: japeto/parallel-tools
+    container_name: node1
+    hostname: node1
+    networks: [mpi-net]
+    tty: true
+    stdin_open: true
+    command: sleep infinity
+
+  node2:
+    image: japeto/parallel-tools
+    container_name: node2
+    hostname: node2
+    networks: [mpi-net]
+    tty: true
+    stdin_open: true
+    command: sleep infinity
+
+  node3:
+    image: japeto/parallel-tools
+    container_name: node3
+    hostname: node3
+    networks: [mpi-net]
+    tty: true
+    stdin_open: true
+    command: sleep infinity
+
+  node4:
+    image: japeto/parallel-tools
+    container_name: node4
+    hostname: node4
+    networks: [mpi-net]
+    tty: true
+    stdin_open: true
+    command: sleep infinity
+
+networks:
+  mpi-net:
+    driver: bridge
